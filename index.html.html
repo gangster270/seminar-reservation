@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>세미나실 예약 시스템</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f3ef;
+    --card: #ffffff;
+    --primary: #2d5a27;
+    --primary-light: #e8f0e6;
+    --primary-dark: #1e3d1a;
+    --accent: #d4a843;
+    --accent-light: #faf3e0;
+    --text: #2c2c2c;
+    --text-light: #6b6b6b;
+    --border: #e0ddd6;
+    --danger: #c0392b;
+    --danger-light: #fdecea;
+    --success: #27ae60;
+    --success-light: #eafaf1;
+    --shadow: 0 2px 16px rgba(0,0,0,0.06);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+    --radius: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 28px 0 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -20%;
+    width: 140%;
+    height: 200%;
+    background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .header h1 {
+    font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    position: relative;
+  }
+
+  .header h1 span {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--primary-dark);
+    font-size: 0.65rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+    vertical-align: middle;
+    margin-left: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .header p {
+    margin-top: 6px;
+    font-size: 0.88rem;
+    opacity: 0.8;
+    font-weight: 300;
+  }
+
+  /* Layout */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  @media (max-width: 768px) {
+    .container { grid-template-columns: 1fr; }
+  }
+
+  /* Card */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 28px;
+    border: 1px solid var(--border);
+  }
+
+  .card-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--primary-dark);
+  }
+
+  .card-title .icon {
+    width: 28px;
+    height: 28px;
+    background: var(--primary-light);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+  }
+
+  /* Form */
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text-light);
+  }
+
+  .form-group label .required {
+    color: var(--danger);
+    margin-left: 2px;
+  }
+
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.92rem;
+    font-family: inherit;
+    transition: all 0.2s;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(45,90,39,0.1);
+    background: white;
+  }
+
+  .time-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(45,90,39,0.3);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  /* Calendar */
+  .cal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .cal-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .cal-nav {
+    display: flex;
+    gap: 6px;
+  }
+
+  .cal-nav button {
+    width: 32px;
+    height: 32px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    color: var(--text);
+  }
+
+  .cal-nav button:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+
+  .cal-dow {
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-light);
+    padding: 6px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    font-weight: 400;
+  }
+
+  .cal-day:hover:not(.empty):not(.past) {
+    background: var(--primary-light);
+  }
+
+  .cal-day.today {
+    font-weight: 700;
+    color: var(--primary);
+    border: 1.5px solid var(--primary);
+  }
+
+  .cal-day.selected {
+    background: var(--primary) !important;
+    color: white !important;
+    font-weight: 600;
+  }
+
+  .cal-day.selected .dot-container .dot { background: white !important; }
+
+  .cal-day.past {
+    color: #ccc;
+    cursor: default;
+  }
+
+  .cal-day.empty {
+    cursor: default;
+  }
+
+  .cal-day .dot-container {
+    display: flex;
+    gap: 2px;
+    margin-top: 2px;
+    height: 5px;
+  }
+
+  .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* Reservation list */
+  .full-width {
+    grid-column: 1 / -1;
+  }
+
+  .res-list {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .res-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+
+  .res-item:hover {
+    border-color: var(--primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  .res-info {
+    flex: 1;
+  }
+
+  .res-info .res-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 3px;
+  }
+
+  .res-info .res-detail {
+    font-size: 0.78rem;
+    color: var(--text-light);
+  }
+
+  .res-time-badge {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    margin-left: 12px;
+  }
+
+  .res-delete {
+    background: none;
+    border: none;
+    color: #ccc;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 4px 8px;
+    margin-left: 8px;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+
+  .res-delete:hover {
+    background: var(--danger-light);
+    color: var(--danger);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-light);
+  }
+
+  .empty-state .empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    opacity: 0.4;
+  }
+
+  .empty-state p {
+    font-size: 0.88rem;
+  }
+
+  /* Modal / Toast */
+  .toast {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    padding: 14px 22px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    transform: translateX(120%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 380px;
+  }
+
+  .toast.show { transform: translateX(0); }
+
+  .toast.success {
+    background: var(--success-light);
+    color: #1a7a42;
+    border: 1px solid #a3d9b1;
+  }
+
+  .toast.error {
+    background: var(--danger-light);
+    color: var(--danger);
+    border: 1px solid #f1b4ae;
+  }
+
+  .toast.warning {
+    background: var(--accent-light);
+    color: #8a6d1b;
+    border: 1px solid #e8d49a;
+  }
+
+  /* Scrollbar */
+  .res-list::-webkit-scrollbar { width: 6px; }
+  .res-list::-webkit-scrollbar-track { background: transparent; }
+  .res-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card { animation: fadeInUp 0.4s ease-out both; }
+  .card:nth-child(2) { animation-delay: 0.08s; }
+  .card:nth-child(3) { animation-delay: 0.16s; }
+
+  /* Today's reservations summary */
+  .today-summary {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .summary-chip {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .summary-chip .num {
+    font-weight: 700;
+    font-size: 0.88rem;
+  }
+
+  .filter-date {
+    font-size: 0.82rem;
+    color: var(--text-light);
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+
+  /* Confirm Dialog */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(2px);
+  }
+
+  .overlay.show { display: flex; }
+
+  .dialog {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+  }
+
+  .dialog h3 {
+    font-size: 1.05rem;
+    margin-bottom: 8px;
+  }
+
+  .dialog p {
+    font-size: 0.88rem;
+    color: var(--text-light);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .dialog-btns {
+    display: flex;
+    gap: 10px;
+  }
+
+  .dialog-btns button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: white;
+    transition: all 0.15s;
+  }
+
+  .dialog-btns .btn-confirm {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+  }
+
+  .dialog-btns .btn-confirm:hover { background: #a93226; }
+  .dialog-btns button:first-child:hover { background: var(--bg); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>세미나실 예약 <span>RESERVATION</span></h1>
+  <p>충남농업기술원 세미나실 온라인 예약 시스템</p>
+</div>
+
+<div class="container">
+  <!-- Reservation Form -->
+  <div class="card">
+    <div class="card-title">
+      <div class="icon">📝</div>
+      예약 신청
+    </div>
+    <form id="reservationForm" onsubmit="return false;">
+      <div class="form-group">
+        <label>소속명 <span class="required">*</span></label>
+        <input type="text" id="department" placeholder="예: 스마트농업연구과" required>
+      </div>
+      <div class="form-group">
+        <label>팀명 <span class="required">*</span></label>
+        <input type="text" id="team" placeholder="예: 데이터분석팀" required>
+      </div>
+      <div class="form-group">
+        <label>담당자명 <span class="required">*</span></label>
+        <input type="text" id="person" placeholder="예: 홍길동" required>
+      </div>
+      <div class="form-group">
+        <label>예약 날짜 <span class="required">*</span></label>
+        <input type="date" id="resDate" required>
+      </div>
+      <div class="time-row">
+        <div class="form-group">
+          <label>시작 시간 <span class="required">*</span></label>
+          <select id="startTime"></select>
+        </div>
+        <div class="form-group">
+          <label>종료 시간 <span class="required">*</span></label>
+          <select id="endTime"></select>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" onclick="submitReservation()">예약하기</button>
+    </form>
+  </div>
+
+  <!-- Calendar -->
+  <div class="card">
+    <div class="card-title">
+      <div class="icon">📅</div>
+      예약 캘린더
+    </div>
+    <div class="cal-header">
+      <button class="cal-nav" style="border:none;background:none;padding:0;">
+        <div class="cal-nav">
+          <button onclick="changeMonth(-1)">◀</button>
+          <button onclick="changeMonth(1)">▶</button>
+        </div>
+      </button>
+      <h3 id="calMonthLabel"></h3>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+
+  <!-- Reservation List -->
+  <div class="card full-width">
+    <div class="card-title">
+      <div class="icon">📋</div>
+      예약 현황
+    </div>
+    <div class="today-summary" id="todaySummary"></div>
+    <div class="filter-date" id="filterLabel"></div>
+    <div class="res-list" id="resList"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Confirm Dialog -->
+<div class="overlay" id="overlay">
+  <div class="dialog">
+    <h3>예약 취소</h3>
+    <p id="dialogMsg">이 예약을 취소하시겠습니까?</p>
+    <div class="dialog-btns">
+      <button onclick="closeDialog()">아니오</button>
+      <button class="btn-confirm" onclick="confirmDelete()">취소하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- State ---
+  let reservations = JSON.parse(localStorage.getItem('seminar_reservations') || '[]');
+  let calYear, calMonth;
+  let selectedDate = null;
+  let deleteTarget = null;
+
+  const today = new Date();
+  calYear = today.getFullYear();
+  calMonth = today.getMonth();
+
+  // --- Init ---
+  function init() {
+    populateTimeSelects();
+    document.getElementById('resDate').min = formatDate(today);
+    renderCalendar();
+    renderList();
+    updateSummary();
+
+    document.getElementById('resDate').addEventListener('change', function() {
+      const d = new Date(this.value + 'T00:00:00');
+      selectedDate = this.value;
+      calYear = d.getFullYear();
+      calMonth = d.getMonth();
+      renderCalendar();
+      renderList();
+    });
+  }
+
+  function populateTimeSelects() {
+    const start = document.getElementById('startTime');
+    const end = document.getElementById('endTime');
+    for (let h = 8; h <= 21; h++) {
+      for (let m = 0; m < 60; m += 30) {
+        const val = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+        start.innerHTML += `<option value="${val}">${val}</option>`;
+        end.innerHTML += `<option value="${val}">${val}</option>`;
+      }
+    }
+    const last = '22:00';
+    end.innerHTML += `<option value="${last}">${last}</option>`;
+    start.value = '09:00';
+    end.value = '10:00';
+  }
+
+  function formatDate(d) {
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  // --- Calendar ---
+  function renderCalendar() {
+    const grid = document.getElementById('calGrid');
+    const label = document.getElementById('calMonthLabel');
+    label.textContent = `${calYear}년 ${calMonth + 1}월`;
+
+    const dows = ['일','월','화','수','목','금','토'];
+    let html = dows.map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+    const firstDay = new Date(calYear, calMonth, 1).getDay();
+    const lastDate = new Date(calYear, calMonth + 1, 0).getDate();
+    const todayStr = formatDate(today);
+
+    for (let i = 0; i < firstDay; i++) {
+      html += '<div class="cal-day empty"></div>';
+    }
+
+    for (let d = 1; d <= lastDate; d++) {
+      const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const isPast = dateStr < todayStr;
+      const isToday = dateStr === todayStr;
+      const isSelected = dateStr === selectedDate;
+
+      const count = reservations.filter(r => r.date === dateStr).length;
+      let dots = '';
+      if (count > 0) {
+        const dotCount = Math.min(count, 3);
+        dots = '<div class="dot-container">' + Array(dotCount).fill('<div class="dot"></div>').join('') + '</div>';
+      }
+
+      let cls = 'cal-day';
+      if (isPast) cls += ' past';
+      if (isToday) cls += ' today';
+      if (isSelected) cls += ' selected';
+
+      html += `<div class="${cls}" onclick="selectDate('${dateStr}', ${isPast})">${d}${dots}</div>`;
+    }
+
+    grid.innerHTML = html;
+  }
+
+  function selectDate(dateStr, isPast) {
+    if (isPast) return;
+    selectedDate = dateStr;
+    document.getElementById('resDate').value = dateStr;
+    renderCalendar();
+    renderList();
+  }
+
+  function changeMonth(dir) {
+    calMonth += dir;
+    if (calMonth < 0) { calMonth = 11; calYear--; }
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    renderCalendar();
+  }
+
+  // --- Reservation Logic ---
+  function hasConflict(date, start, end, excludeId) {
+    return reservations.some(r => {
+      if (r.date !== date) return false;
+      if (excludeId && r.id === excludeId) return false;
+      return start < r.endTime && end > r.startTime;
+    });
+  }
+
+  function submitReservation() {
+    const dept = document.getElementById('department').value.trim();
+    const team = document.getElementById('team').value.trim();
+    const person = document.getElementById('person').value.trim();
+    const date = document.getElementById('resDate').value;
+    const startTime = document.getElementById('startTime').value;
+    const endTime = document.getElementById('endTime').value;
+
+    if (!dept || !team || !person || !date) {
+      showToast('모든 항목을 입력해주세요.', 'warning');
+      return;
+    }
+
+    if (startTime >= endTime) {
+      showToast('종료 시간은 시작 시간 이후여야 합니다.', 'warning');
+      return;
+    }
+
+    if (hasConflict(date, startTime, endTime)) {
+      showToast('⚠️ 해당 시간대에 이미 예약이 존재합니다. 다른 시간을 선택해주세요.', 'error');
+      return;
+    }
+
+    const reservation = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      department: dept,
+      team: team,
+      person: person,
+      date: date,
+      startTime: startTime,
+      endTime: endTime,
+      createdAt: new Date().toISOString()
+    };
+
+    reservations.push(reservation);
+    save();
+
+    selectedDate = date;
+    renderCalendar();
+    renderList();
+    updateSummary();
+
+    // Reset form partially
+    document.getElementById('person').value = '';
+    document.getElementById('startTime').value = '09:00';
+    document.getElementById('endTime').value = '10:00';
+
+    showToast('✅ 예약이 완료되었습니다!', 'success');
+  }
+
+  function deleteReservation(id) {
+    deleteTarget = id;
+    const r = reservations.find(r => r.id === id);
+    if (r) {
+      document.getElementById('dialogMsg').textContent =
+        `${r.date} ${r.startTime}~${r.endTime} (${r.person}) 예약을 취소하시겠습니까?`;
+    }
+    document.getElementById('overlay').classList.add('show');
+  }
+
+  function confirmDelete() {
+    if (deleteTarget) {
+      reservations = reservations.filter(r => r.id !== deleteTarget);
+      save();
+      renderCalendar();
+      renderList();
+      updateSummary();
+      showToast('예약이 취소되었습니다.', 'warning');
+    }
+    closeDialog();
+  }
+
+  function closeDialog() {
+    document.getElementById('overlay').classList.remove('show');
+    deleteTarget = null;
+  }
+
+  // --- Render List ---
+  function renderList() {
+    const list = document.getElementById('resList');
+    const label = document.getElementById('filterLabel');
+
+    let filtered = reservations;
+    if (selectedDate) {
+      filtered = reservations.filter(r => r.date === selectedDate);
+      const d = new Date(selectedDate + 'T00:00:00');
+      label.textContent = `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 예약 목록`;
+    } else {
+      // Show upcoming
+      const todayStr = formatDate(today);
+      filtered = reservations.filter(r => r.date >= todayStr);
+      label.textContent = '전체 예약 목록 (오늘 이후)';
+    }
+
+    filtered.sort((a, b) => {
+      if (a.date !== b.date) return a.date.localeCompare(b.date);
+      return a.startTime.localeCompare(b.startTime);
+    });
+
+    if (filtered.length === 0) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📭</div>
+          <p>등록된 예약이 없습니다.</p>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(r => `
+      <div class="res-item">
+        <div class="res-info">
+          <div class="res-title">${r.department} / ${r.team}</div>
+          <div class="res-detail">담당자: ${r.person} · ${r.date}</div>
+        </div>
+        <div class="res-time-badge">${r.startTime} ~ ${r.endTime}</div>
+        <button class="res-delete" onclick="deleteReservation('${r.id}')" title="예약 취소">✕</button>
+      </div>
+    `).join('');
+  }
+
+  function updateSummary() {
+    const todayStr = formatDate(today);
+    const todayCount = reservations.filter(r => r.date === todayStr).length;
+    const totalCount = reservations.filter(r => r.date >= todayStr).length;
+
+    document.getElementById('todaySummary').innerHTML = `
+      <div class="summary-chip">오늘 예약 <span class="num">${todayCount}</span>건</div>
+      <div class="summary-chip">전체 예약 <span class="num">${totalCount}</span>건</div>
+    `;
+  }
+
+  // --- Storage ---
+  function save() {
+    localStorage.setItem('seminar_reservations', JSON.stringify(reservations));
+  }
+
+  // --- Toast ---
+  function showToast(msg, type) {
+    const toast = document.getElementById('toast');
+    toast.className = 'toast ' + type;
+    toast.textContent = msg;
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+
+  // --- Go ---
+  init();
+</script>
+</body>
+</html>
