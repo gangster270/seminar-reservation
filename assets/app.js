@@ -62,9 +62,13 @@ async function reload() {
     setNotice('');
   } catch (err) {
     state.rows = err.cached || [];
+    // 사내망에서 예약 서버가 막힌 경우가 가장 흔하므로 원문 오류 대신 상황을 설명한다.
+    const offline = /failed to fetch|networkerror|load failed/i.test(err.message);
     setNotice(
-      `예약 목록을 불러오지 못했어요: ${err.message}` +
-      (err.cached ? ' (마지막으로 받아둔 내용을 보여주고 있어요)' : ''),
+      (offline ? '예약 서버에 연결하지 못했어요.' : `예약 목록을 불러오지 못했어요: ${err.message}`) +
+      (err.cached
+        ? ' 마지막으로 받아둔 내용을 보여주고 있어요. 최신 현황은 휴대폰에서 확인해주세요.'
+        : ' 잠시 후 새로고침해주세요.'),
     );
   } finally {
     state.loading = false;
