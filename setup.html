@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회의실 예약 - 공유 설정</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%97%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface-sub: #f7f8fa;
+    --line: #e5e8eb;
+    --text: #191f28;
+    --text-2: #4e5968;
+    --text-3: #8b95a1;
+    --accent: #3182f6;
+    --accent-soft: #e8f3ff;
+    --accent-dark: #1b64da;
+    --ok: #03b26c;
+    --ok-soft: #e8faf3;
+    --danger: #f04452;
+    --danger-soft: #fff0f1;
+    --warn: #b45309;
+    --warn-soft: #fef4e6;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16181d;
+      --surface: #1f2229;
+      --surface-sub: #262a33;
+      --line: #333944;
+      --text: #f2f4f6;
+      --text-2: #c6ccd6;
+      --text-3: #939aa6;
+      --accent: #5a9dff;
+      --accent-soft: #23324a;
+      --accent-dark: #7fb4ff;
+      --ok: #2ad598;
+      --ok-soft: #16352b;
+      --danger: #ff6b76;
+      --danger-soft: #3a2226;
+      --warn: #f0b464;
+      --warn-soft: #362a18;
+    }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 28px 16px 80px;
+    font-size: 15px;
+  }
+
+  .wrap { max-width: 640px; margin: 0 auto; display: grid; gap: 14px; }
+
+  header { padding: 0 4px 4px; }
+  header h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.6px; }
+  header p { color: var(--text-3); font-size: 14px; margin-top: 6px; }
+
+  .card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+
+  .card > h2 {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .step-no {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card p, .card li { color: var(--text-2); font-size: 14px; }
+  .card > p, .card > ul, .card > ol { margin-top: 12px; }
+  .card ul, .card ol { padding-left: 20px; display: grid; gap: 6px; }
+
+  .why {
+    background: var(--warn-soft);
+    color: var(--warn);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  kbd {
+    background: var(--surface-sub);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 1px 6px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: none;
+    border-radius: 11px;
+    background: var(--accent);
+    color: #fff;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 12px 18px;
+    cursor: pointer;
+    text-decoration: none;
+    margin-top: 14px;
+  }
+
+  .btn:hover { background: var(--accent-dark); }
+  .btn.ghost { background: var(--surface-sub); color: var(--text-2); }
+  .btn.ghost:hover { background: var(--line); }
+  .btn:disabled { opacity: 0.55; cursor: default; }
+  .btn.block { width: 100%; }
+
+  input[type='url'] {
+    width: 100%;
+    margin-top: 14px;
+    padding: 13px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    font: inherit;
+    font-size: 15px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+  }
+
+  input[type='url']:focus { border-color: var(--accent); }
+
+  pre {
+    margin-top: 14px;
+    background: var(--surface-sub);
+    border-radius: 12px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .checks { margin-top: 16px; display: grid; gap: 8px; }
+
+  .check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text-2);
+    background: var(--surface-sub);
+    border-radius: 10px;
+    padding: 11px 13px;
+  }
+
+  .check .mark { flex-shrink: 0; font-weight: 800; width: 18px; text-align: center; }
+  .check.ok { background: var(--ok-soft); color: var(--ok); font-weight: 600; }
+  .check.bad { background: var(--danger-soft); color: var(--danger); font-weight: 600; }
+  .check.run { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+  .result {
+    margin-top: 16px;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.6;
+  }
+
+  .result.ok { background: var(--ok-soft); color: var(--ok); }
+  .result.bad { background: var(--danger-soft); color: var(--danger); }
+
+  .hint { font-size: 13px; color: var(--text-3); margin-top: 10px; }
+
+  a { color: var(--accent); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .check { transition: background 0.2s, color 0.2s; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>모두가 같은 예약 현황 보기</h1>
+    <p>예약 내용을 구글 스프레드시트에 모아두면, QR로 들어온 모든 사람이 같은 화면을 봅니다.
+       한 번만 설정하면 됩니다.</p>
+  </header>
+
+  <div class="why" id="whyBox">
+    지금은 <b>시험 모드</b>입니다. 예약이 각자의 휴대폰에만 저장돼서, 다른 부서에는 보이지 않습니다.
+  </div>
+
+  <div class="card">
+    <h2><span class="step-no">1</span>예약을 담아둘 스프레드시트 만들기</h2>
+    <p>구글 계정으로 빈 스프레드시트를 하나 만듭니다. 이름은 <b>회의실 예약 대장</b> 정도면 충분합니다.
+       예약이 이 시트에 한 줄씩 쌓이고, 관리자는 여기서 바로 확인하거나 고칠 수 있습니다.</p>
+    <a class="btn" href="https://sheets.new" target="_blank" rel="noopener">새 스프레드시트 만들기</a>
+  </div>
+
+  <div class="card">
+    <h2><span class="step-no">2</span>스프레드시트에 처리 코드 넣기</h2>
+    <p>방금 만든 스프레드시트에서 <kbd>확장 프로그램</kbd> → <kbd>Apps Script</kbd> 를 엽니다.
+       편집기에 있던 내용을 모두 지우고 아래 코드를 붙여넣은 뒤 저장합니다.</p>
+    <button class="btn" id="btnCopyCode" type="button">코드 복사하기</button>
+    <p class="hint" id="codeHint"></p>
+  </div>
+
+  <div class="card">
+    <h2><span class="step-no">3</span>웹 앱으로 배포하기</h2>
+    <p>Apps Script 편집기 오른쪽 위 <kbd>배포</kbd> → <kbd>새 배포</kbd> 를 누르고,
+       톱니바퀴에서 <kbd>웹 앱</kbd> 을 고른 뒤 이렇게 설정합니다.</p>
+    <ul>
+      <li>실행 계정 — <b>나</b></li>
+      <li>액세스 권한이 있는 사용자 — <b>모든 사용자</b></li>
+    </ul>
+    <p>처음 한 번은 권한을 묻는 화면이 나옵니다.
+       <kbd>고급</kbd> → <kbd>(프로젝트 이름)(으)로 이동</kbd> 을 눌러 계속 진행하세요.
+       내가 만든 스크립트라 안전합니다.</p>
+    <p>배포가 끝나면 <b>/exec</b> 로 끝나는 주소가 나옵니다. 그 주소를 복사하세요.</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="step-no">4</span>주소 넣고 연결 확인하기</h2>
+    <p>복사한 주소를 붙여넣고 확인을 누르면, 실제로 예약을 하나 넣었다가 다시 지워보며
+       제대로 연결됐는지 검사합니다. 검사용 예약은 자동으로 지워집니다.</p>
+    <input type="url" id="gasUrl" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
+    <button class="btn block" id="btnTest" type="button">연결 확인하기</button>
+    <div class="checks" id="checks" hidden></div>
+    <div class="result" id="result" hidden></div>
+  </div>
+
+  <div class="card" id="finalCard" hidden>
+    <h2><span class="step-no">5</span>설정 파일에 넣기</h2>
+    <p><code>assets/config.js</code> 파일에서 <b>backend</b> 부분을 아래 내용으로 바꾸고 저장하면 끝입니다.
+       GitHub 저장소에서 파일을 열고 연필 아이콘을 눌러 바로 고칠 수 있습니다.</p>
+    <pre id="snippet"></pre>
+    <button class="btn" id="btnCopySnippet" type="button">설정 복사하기</button>
+    <p class="hint">저장한 뒤 예약 화면을 새로고침하면 오른쪽 위 배지가
+      <b>공유 서버 연결됨</b> 으로 바뀝니다.</p>
+  </div>
+
+  <div class="card">
+    <h2>예약 화면으로 돌아가기</h2>
+    <p>설정을 마쳤다면 예약 화면에서 바로 확인해 보세요.</p>
+    <a class="btn ghost" href="./index.html">예약 화면 열기</a>
+  </div>
+
+</div>
+
+<script type="module">
+import { CONFIG } from './assets/config.js';
+
+const $ = (id) => document.getElementById(id);
+
+if (CONFIG.backend.mode === 'sheets' && CONFIG.backend.url.trim()) {
+  $('whyBox').textContent = '이미 공유 설정이 끝났습니다. 아래에서 연결 상태를 다시 확인할 수 있습니다.';
+  $('whyBox').style.background = 'var(--ok-soft)';
+  $('whyBox').style.color = 'var(--ok)';
+  $('gasUrl').value = CONFIG.backend.url;
+}
+
+/* ---- 2단계: Code.gs 복사 ---- */
+let scriptSource = '';
+fetch('./apps-script/Code.gs')
+  .then((res) => (res.ok ? res.text() : Promise.reject(new Error(String(res.status)))))
+  .then((text) => {
+    scriptSource = text;
+    $('codeHint').textContent = `Code.gs · ${text.split('\n').length}줄`;
+  })
+  .catch(() => {
+    $('btnCopyCode').disabled = true;
+    $('codeHint').innerHTML =
+      '코드를 자동으로 불러오지 못했습니다. 저장소의 <b>apps-script/Code.gs</b> 파일을 직접 열어 복사하세요.';
+  });
+
+async function copy(text, button, done) {
+  const label = button.textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    button.textContent = done;
+  } catch {
+    button.textContent = '복사에 실패했어요 — 직접 선택해 주세요';
+  }
+  setTimeout(() => { button.textContent = label; }, 2200);
+}
+
+$('btnCopyCode').onclick = () => copy(scriptSource, $('btnCopyCode'), '복사했습니다 ✓');
+
+/* ---- 4단계: 연결 확인 ---- */
+const STEPS = [
+  '주소에 응답이 오는지 확인',
+  '예약 목록을 읽어오는지 확인',
+  '예약이 저장되는지 확인',
+  '저장된 예약이 모두에게 보이는지 확인',
+  '검사용 예약 되돌리기',
+];
+
+function paintChecks(states) {
+  $('checks').hidden = false;
+  $('checks').innerHTML = STEPS.map((label, i) => {
+    const state = states[i] || '';
+    const mark = { ok: '✓', bad: '✕', run: '…' }[state] || '·';
+    return `<div class="check ${state}"><span class="mark">${mark}</span><span>${label}</span></div>`;
+  }).join('');
+}
+
+function fail(message, hint) {
+  $('result').hidden = false;
+  $('result').className = 'result bad';
+  $('result').innerHTML = `${message}${hint ? `<br><span style="font-weight:500">${hint}</span>` : ''}`;
+}
+
+async function askServer(url, payload) {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload),
+    redirect: 'follow',
+  });
+  return readJson(res);
+}
+
+async function readJson(res) {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error('서버가 예약 데이터 대신 다른 화면을 돌려줬어요.');
+  }
+}
+
+$('btnTest').onclick = async () => {
+  const url = $('gasUrl').value.trim();
+  $('result').hidden = true;
+  $('finalCard').hidden = true;
+
+  if (!/^https:\/\/script\.google(usercontent)?\.com\/macros\/s\/[^/]+\/exec$/.test(url)) {
+    paintChecks([]);
+    return fail(
+      '주소 형식이 올바르지 않아요.',
+      '<b>/exec</b> 로 끝나는 배포 주소여야 합니다. 편집기 주소(/edit)나 테스트 주소(/dev)는 쓸 수 없어요.',
+    );
+  }
+
+  const button = $('btnTest');
+  button.disabled = true;
+  button.textContent = '확인하는 중…';
+  const states = ['run'];
+  paintChecks(states);
+
+  // 실제 예약과 겹치지 않도록 먼 미래 날짜로 검사한다.
+  const probe = {
+    room: CONFIG.rooms[0].id,
+    date: '2099-12-31',
+    start: '23:00',
+    end: '23:30',
+    dept: '연결 확인',
+    person: '자동 검사',
+    purpose: '',
+    contact: '',
+    pinHash: `setup-check-${Math.random().toString(36).slice(2, 10)}`,
+  };
+
+  try {
+    const listUrl = new URL(url);
+    listUrl.searchParams.set('action', 'list');
+    listUrl.searchParams.set('from', '2099-12-01');
+    listUrl.searchParams.set('to', '2099-12-31');
+
+    const first = await readJson(await fetch(listUrl, { redirect: 'follow' }));
+    states[0] = 'ok';
+    states[1] = first.ok ? 'ok' : 'bad';
+    paintChecks(states);
+    if (!first.ok) throw new Error(first.error || '목록을 읽지 못했어요.');
+
+    states[2] = 'run';
+    paintChecks(states);
+    const created = await askServer(url, { action: 'create', reservation: probe });
+    states[2] = created.ok ? 'ok' : 'bad';
+    paintChecks(states);
+    if (!created.ok) throw new Error(created.error || '예약을 저장하지 못했어요.');
+
+    states[3] = 'run';
+    paintChecks(states);
+    const again = await readJson(await fetch(listUrl, { redirect: 'follow' }));
+    const found = again.ok && again.data.some((r) => r.id === created.data.id);
+    states[3] = found ? 'ok' : 'bad';
+    paintChecks(states);
+    if (!found) throw new Error('저장은 됐는데 목록에서 다시 찾지 못했어요.');
+    if (again.data.some((r) => r.pinHash)) {
+      throw new Error('서버가 비밀번호 값을 함께 내려보내고 있어요. Code.gs 를 최신 내용으로 다시 붙여넣어 주세요.');
+    }
+
+    states[4] = 'run';
+    paintChecks(states);
+    const removed = await askServer(url, { action: 'cancel', id: created.data.id, pinHash: probe.pinHash });
+    states[4] = removed.ok ? 'ok' : 'bad';
+    paintChecks(states);
+    if (!removed.ok) throw new Error(removed.error || '검사용 예약을 지우지 못했어요.');
+
+    $('result').hidden = false;
+    $('result').className = 'result ok';
+    $('result').innerHTML = '연결됐습니다. 이제 마지막 5단계만 하면 모든 부서가 같은 예약 현황을 봅니다.';
+    $('snippet').textContent = `backend: {\n  mode: 'sheets',\n  url: '${url}',\n},`;
+    $('finalCard').hidden = false;
+    $('finalCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (err) {
+    const i = states.findIndex((s) => s === 'run');
+    if (i >= 0) states[i] = 'bad';
+    paintChecks(states);
+    const known = {
+      'Failed to fetch': [
+        '주소에 연결하지 못했어요.',
+        '주소가 맞는지, 배포할 때 <b>액세스 권한이 있는 사용자</b>를 <b>모든 사용자</b>로 두었는지 확인해 주세요.',
+      ],
+      '서버가 예약 데이터 대신 다른 화면을 돌려줬어요.': [
+        '서버가 예약 데이터 대신 다른 화면을 돌려줬어요.',
+        '보통 로그인 화면이 대신 나온 경우입니다. 액세스 권한을 <b>모든 사용자</b>로 바꾸고 <b>새 배포</b>를 다시 만들어 주세요.',
+      ],
+    };
+    const [message, hint] = known[err.message] || [err.message, ''];
+    fail(message, hint);
+  } finally {
+    button.disabled = false;
+    button.textContent = '연결 확인하기';
+  }
+};
+
+$('btnCopySnippet').onclick = () => copy($('snippet').textContent, $('btnCopySnippet'), '복사했습니다 ✓');
+</script>
+</body>
+</html>

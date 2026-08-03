@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회의실 예약 QR 안내문</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%85%3C/text%3E%3C/svg%3E">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    background: #f4f5f7;
+    color: #191f28;
+    padding: 24px 16px 60px;
+    line-height: 1.5;
+  }
+
+  .toolbar {
+    max-width: 520px;
+    margin: 0 auto 20px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .toolbar h1 { font-size: 18px; font-weight: 800; letter-spacing: -0.4px; }
+  .toolbar p { font-size: 13px; color: #8b95a1; margin-top: 4px; }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4e5968;
+    margin: 16px 0 7px;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #e5e8eb;
+    border-radius: 12px;
+    font: inherit;
+    font-size: 15px;
+    outline: none;
+    background: #fff;
+    color: inherit;
+  }
+
+  input:focus, select:focus { border-color: #3182f6; }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  button {
+    width: 100%;
+    margin-top: 18px;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: #3182f6;
+    color: #fff;
+    font: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  button:hover { background: #1b64da; }
+
+  /* ---- 인쇄되는 안내문 ---- */
+  .poster {
+    max-width: 520px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 20px;
+    padding: 44px 36px 40px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .poster .eyebrow {
+    font-size: 14px;
+    font-weight: 700;
+    color: #3182f6;
+    letter-spacing: 2px;
+  }
+
+  .poster h2 {
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    margin: 10px 0 6px;
+  }
+
+  .poster .lead { font-size: 16px; color: #4e5968; }
+
+  .qr-box {
+    margin: 30px auto 24px;
+    width: 280px;
+    max-width: 100%;
+    border: 1px solid #e5e8eb;
+    border-radius: 18px;
+    padding: 14px;
+    background: #fff;
+  }
+
+  .qr-box svg { width: 100%; height: auto; display: block; }
+
+  .poster .url {
+    font-size: 13px;
+    color: #8b95a1;
+    word-break: break-all;
+    margin-bottom: 26px;
+  }
+
+  .steps {
+    text-align: left;
+    display: grid;
+    gap: 12px;
+    border-top: 1px solid #f0f1f3;
+    padding-top: 24px;
+  }
+
+  .steps div {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 15px;
+    color: #4e5968;
+  }
+
+  .steps b {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #e8f3ff;
+    color: #3182f6;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .error { color: #f04452; font-size: 14px; font-weight: 600; margin-top: 12px; }
+
+  @media print {
+    @page { margin: 12mm; }
+    body { background: #fff; padding: 0; }
+    .toolbar { display: none; }
+    .poster { box-shadow: none; border-radius: 0; max-width: none; padding: 0; }
+    .qr-box { border-color: #ddd; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h1>QR 안내문 만들기</h1>
+  <p>내용을 고친 뒤 인쇄해서 회의실 문 앞에 붙이면 됩니다.</p>
+
+  <label for="url">예약 사이트 주소</label>
+  <input id="url" type="url" placeholder="https://...">
+
+  <label for="place">기관 · 회사명</label>
+  <input id="place" type="text" placeholder="예) 총무팀">
+
+  <label for="heading">큰 제목</label>
+  <input id="heading" type="text" placeholder="회의실 예약">
+
+  <div class="row">
+    <div>
+      <label for="ec">오류정정 수준</label>
+      <select id="ec">
+        <option value="L">L (작게)</option>
+        <option value="M" selected>M (권장)</option>
+        <option value="Q">Q</option>
+        <option value="H">H (튼튼하게)</option>
+      </select>
+    </div>
+    <div>
+      <label for="size">QR 크기</label>
+      <select id="size">
+        <option value="220">작게</option>
+        <option value="280" selected>보통</option>
+        <option value="360">크게</option>
+      </select>
+    </div>
+  </div>
+
+  <button type="button" id="btnPrint">인쇄하기</button>
+  <div class="error" id="error" hidden></div>
+</div>
+
+<div class="poster">
+  <div class="eyebrow" id="pPlace"></div>
+  <h2 id="pHeading">회의실 예약</h2>
+  <p class="lead">휴대폰 카메라로 QR을 찍어주세요</p>
+  <div class="qr-box" id="qrBox"></div>
+  <p class="url" id="pUrl"></p>
+  <div class="steps">
+    <div><b>1</b><span>카메라로 QR을 찍으면 예약 화면이 열립니다.</span></div>
+    <div><b>2</b><span>달력에서 원하는 날짜를 고르고, 비어 있는 시간을 누릅니다.</span></div>
+    <div><b>3</b><span>부서명·예약자·시간을 입력하면 예약이 끝납니다.</span></div>
+    <div><b>4</b><span>취소는 예약할 때 정한 비밀번호 4자리로 직접 할 수 있습니다.</span></div>
+  </div>
+</div>
+
+<script type="module">
+import { qrToSvg } from './assets/qrcode.js';
+import { CONFIG } from './assets/config.js';
+
+const $ = (id) => document.getElementById(id);
+const defaultUrl = new URL('./', location.href).href;
+
+$('url').value = defaultUrl;
+$('heading').value = CONFIG.title;
+$('place').value = CONFIG.subtitle;
+
+function draw() {
+  const url = $('url').value.trim() || defaultUrl;
+  const size = Number($('size').value);
+
+  $('pPlace').textContent = $('place').value.trim();
+  $('pHeading').textContent = $('heading').value.trim() || '회의실 예약';
+  $('pUrl').textContent = url;
+  $('qrBox').style.width = `${size}px`;
+
+  try {
+    $('qrBox').innerHTML = qrToSvg(url, { ecLevel: $('ec').value, quietZone: 2, scale: 8 });
+    $('error').hidden = true;
+  } catch (err) {
+    $('qrBox').innerHTML = '';
+    $('error').hidden = false;
+    $('error').textContent = err.message;
+  }
+}
+
+['url', 'place', 'heading', 'ec', 'size'].forEach((id) => {
+  $(id).addEventListener('input', draw);
+  $(id).addEventListener('change', draw);
+});
+$('btnPrint').onclick = () => window.print();
+
+draw();
+</script>
+</body>
+</html>
