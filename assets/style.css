@@ -13,6 +13,9 @@
   --accent-dark: #1b64da;
   --danger: #f04452;
   --danger-soft: #fff0f1;
+  --warn: #b45309;
+  --warn-soft: #fef4e6;
+  --warn-line: #f6dfba;
   --ok: #03b26c;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   --shadow-lg: 0 -6px 28px rgba(0, 0, 0, 0.14);
@@ -35,6 +38,9 @@
     --accent-dark: #7fb4ff;
     --danger: #ff6b76;
     --danger-soft: #3a2226;
+    --warn: #f0b464;
+    --warn-soft: #362a18;
+    --warn-line: #4d3a1e;
     --shadow: none;
     --shadow-lg: 0 -6px 28px rgba(0, 0, 0, 0.5);
   }
@@ -45,6 +51,11 @@
   padding: 0;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* display 를 지정한 클래스가 hidden 속성을 덮어쓰지 않도록 한다. */
+[hidden] {
+  display: none !important;
 }
 
 body {
@@ -107,6 +118,51 @@ body {
   background: var(--accent-soft);
   color: var(--accent);
 }
+
+/* ---------- 시험 모드 알림 ---------- */
+.mode-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: var(--warn-soft);
+  border: 1px solid var(--warn-line);
+  color: var(--warn);
+  text-decoration: none;
+}
+
+.mode-banner:hover { border-color: var(--warn); }
+
+.mode-banner-mark {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--warn);
+  color: var(--warn-soft);
+  font-size: 14px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mode-banner-text {
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.mode-banner-text b {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 1px;
+}
+
+.mode-banner svg { flex-shrink: 0; }
 
 /* ---------- 카드 ---------- */
 /* 하단 고정 버튼에 마지막 카드가 가리지 않도록 여백을 준다. (.wrap 보다 우선해야 함) */

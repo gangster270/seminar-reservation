@@ -405,6 +405,8 @@ function init() {
   const badge = $('storageBadge');
   badge.textContent = store.label;
   badge.classList.toggle('shared', store.shared);
+  // 공유 설정이 끝나기 전에는 "다들 같은 화면을 본다"고 오해하지 않도록 크게 알린다.
+  $('modeBanner').hidden = store.shared;
 
   fillTimeSelects();
   renderRoomSeg();
